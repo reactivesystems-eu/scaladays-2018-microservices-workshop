@@ -20,3 +20,9 @@ To make sure everything works fine, import the stub project into your developmen
 
 
 Tip: Even while the sources for the workshop aren't here yet, you can already test your setup with a Lagom "Hello World" project. Just follow the instructions on https://www.lagomframework.com/get-started-scala.html and https://www.lagomframework.com/documentation/1.4.x/scala/IntellijSbt.html
+
+
+
+### Option to influence
+
+* The workshop will have a somewhat exploratory, hackathon-like style: We will design an application (or at least a few use cases) using Event Storming, and then implement it using Lagom. I have an idea what we can implement, but you are also welcome to bring your own ideas! If you have a use case you are specifically interested in, we can take a vote at the beginning of the workshop and pick one of the proposals.
