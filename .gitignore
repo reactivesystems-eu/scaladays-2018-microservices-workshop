@@ -3,6 +3,9 @@ target
 ideatarget
 .target
 .idea
+*.sc
+*.json
+
 
 # sbt 
 bin
