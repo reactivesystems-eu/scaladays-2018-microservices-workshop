@@ -18,10 +18,10 @@ class ListingEntity extends PersistentEntity {
 
   override def initialState: ListingState = ListingState(ListingStatus.NotCreated)
 
-  override def behavior: Behavior = Actions().onCommand[CreateListing.type, Done] {
-    case (CreateListing, ctx, state) => ctx.thenPersist(ListingCreatedESEvent)(_ => ctx.reply(Done))
+  override def behavior: Behavior = Actions().onCommand[CreateListing, Done] {
+    case (CreateListing(uuid), ctx, state) => ctx.thenPersist(ListingCreatedESEvent(uuid))(_ => ctx.reply(Done))
   }.onEvent {
-    case (ListingCreatedESEvent, state) => state
+    case (ListingCreatedESEvent(_), state) => state
   }
 
 }
@@ -51,8 +51,10 @@ object ListingStatus extends Enumeration {
   */
 sealed trait ListingCommand
 
-case object CreateListing extends ListingCommand with ReplyType[Done] {
-  implicit val format: Format[CreateListing.type] = singletonFormat(CreateListing)
+case class CreateListing(listingId: UUID) extends ListingCommand with ReplyType[Done]
+
+object CreateListing {
+  implicit val format: Format[CreateListing] = Json.format
 }
 
 
@@ -67,6 +69,8 @@ object ListingESEvent {
   val Tag = AggregateEventTag[ListingESEvent]
 }
 
-case object ListingCreatedESEvent extends ListingESEvent {
-  implicit val format: Format[ListingCreatedESEvent.type] = singletonFormat(ListingCreatedESEvent)
+case class ListingCreatedESEvent(listingId: UUID) extends ListingESEvent
+
+object ListingCreatedESEvent {
+  implicit val format: Format[ListingCreatedESEvent] = Json.format
 }
