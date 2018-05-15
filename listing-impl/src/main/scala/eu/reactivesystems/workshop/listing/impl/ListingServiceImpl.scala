@@ -16,6 +16,13 @@ class ListingServiceImpl(persistentEntityRegistry: PersistentEntityRegistry)(
   override def healthCheck(): ServiceCall[NotUsed, String] =
     request => Future.successful("OK")
 
+
+  override def createListing(): ServiceCall[NotUsed, UUID] = {
+    request =>
+      val uuid = UUID.randomUUID()
+      entityRef(uuid).ask(CreateListing).map(_ => uuid)
+  }
+
   private def entityRef(listingId: UUID) =
     persistentEntityRegistry.refFor[ListingEntity](listingId.toString)
 

@@ -32,7 +32,7 @@ class BookingRegisterSpec extends WordSpecLike with Matchers with BeforeAndAfter
       val uuid = outcome.replies.head.asInstanceOf[UUID]
       outcome.events should be(Seq(BookingRequested(uuid, guestId, date, 3, 1)))
       outcome.state should be(BookingRegisterState(BookingRegisterStatus.Listed, Map(uuid.toString -> Booking(uuid, guestId, date, 3, 1))))
-      outcome.issues should be(Nil)
+      outcome.issues should be(empty)
     }
   }
 }

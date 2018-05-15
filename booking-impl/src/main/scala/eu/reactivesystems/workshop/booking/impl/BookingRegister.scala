@@ -18,7 +18,7 @@ class BookingRegister extends PersistentEntity {
   override type Command = BookingRegisterCommand
   override type Event = BookingRegisterEvent
 
-  override def initialState: BookingRegisterState = BookingRegisterState(BookingRegisterStatus.Listed, Map.empty)
+  override def initialState: BookingRegisterState = BookingRegisterState(BookingRegisterStatus.Unlisted, Map.empty)
 
 
   override def behavior: Behavior = {
@@ -33,10 +33,14 @@ class BookingRegister extends PersistentEntity {
     Actions().onCommand[ListRoom.type, Done] {
       case (ListRoom, ctx, state) =>
         ctx.thenPersist(RoomListed)(event => ctx.reply(Done))
-
-    }.onEvent {
-      case (RoomListed, state) => state.copy(status = BookingRegisterStatus.Listed)
+    }.onCommand[UnlistRoom.type, Done] {
+      case (UnlistRoom, ctx, state) =>
+        ctx.reply(Done)
+        ctx.done
     }
+      .onEvent {
+        case (RoomListed, state) => state.copy(status = BookingRegisterStatus.Listed)
+      }.orElse(cancelAction)
 
   private def listed =
     Actions().onCommand[RequestBooking, UUID] {
@@ -56,8 +60,23 @@ class BookingRegister extends PersistentEntity {
         state.copy(requestedBookings =
           state.requestedBookings + (event.bookingId.toString ->
             Booking(event.bookingId, event.guest, event.startingDate, event.duration, event.numberOfGuests)))
-    }
+    }.orElse(cancelAction)
+
+
+  private def cancelAction = Actions().onCommand[CancelBooking, Done] {
+    case (CancelBooking(bookingId), ctx, state) =>
+      state.requestedBookings.get(bookingId.toString).fold {
+        ctx.invalidCommand("no such booking")
+        ctx.done
+      }(_ => ctx.thenPersist(BookingCancelled(bookingId))(event => ctx.reply(Done)))
+  }.onEvent {
+    case (BookingCancelled(bookingId), state) =>
+      state.copy(requestedBookings = state.requestedBookings - bookingId.toString)
+  }
+
+
 }
+
 
 /**
   * The state.
@@ -101,13 +120,25 @@ object RequestBooking {
 
 case class CancelBooking(bookingId: UUID) extends BookingRegisterCommand with ReplyType[Done]
 
+object CancelBooking {
+  implicit val format: Format[CancelBooking] = Json.format
+}
+
 case class RejectBooking(bookingId: UUID) extends BookingRegisterCommand with ReplyType[Done]
 
-case class WithdrawBooking(bookingId: UUID) extends BookingRegisterCommand with ReplyType[Done]
+object RejectBooking {
+  implicit val format: Format[RejectBooking] = Json.format
+}
 
-case object ListRoom extends BookingRegisterCommand with ReplyType[Done]
 
-case object UnlistRoom extends BookingRegisterCommand with ReplyType[Done]
+case object ListRoom extends BookingRegisterCommand with ReplyType[Done] {
+  implicit val format: Format[ListRoom.type] = singletonFormat(ListRoom)
+}
+
+
+case object UnlistRoom extends BookingRegisterCommand with ReplyType[Done] {
+  implicit val format: Format[UnlistRoom.type] = singletonFormat(UnlistRoom)
+}
 
 
 /**
@@ -127,7 +158,15 @@ object BookingRequested {
   implicit val format: Format[BookingRequested] = Json.format
 }
 
-case object RoomListed extends BookingRegisterEvent
+case class BookingCancelled(bookingId: UUID) extends BookingRegisterEvent
+
+object BookingCancelled {
+  implicit val format: Format[BookingCancelled] = Json.format
+}
+
+case object RoomListed extends BookingRegisterEvent {
+  implicit val format: Format[RoomListed.type] = singletonFormat(RoomListed)
+}
 
 
 object BookingRegisterEvent {

@@ -4,6 +4,8 @@ import com.lightbend.lagom.scaladsl.playjson.{JsonSerializer, JsonSerializerRegi
 
 object ListingSerializerRegistry extends JsonSerializerRegistry {
   override def serializers = List(
-    JsonSerializer[ListingState]
+    JsonSerializer[ListingState],
+    JsonSerializer[CreateListing.type],
+    JsonSerializer[ListingCreatedESEvent.type]
   )
 }
