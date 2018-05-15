@@ -21,6 +21,7 @@ abstract class BookingApplication(context: LagomApplicationContext) extends Lago
   // Initialize everything
   persistentEntityRegistry.register(wire[BookingRegister])
 
+
 }
 
 class BookingApplicationLoader extends LagomApplicationLoader {

@@ -2,16 +2,25 @@ package eu.reactivesystems.workshop.booking.impl
 
 import java.util.UUID
 
+import akka.stream.scaladsl.Flow
 import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
 import eu.reactivesystems.workshop.booking.api.{BookingRequest, BookingService, ListingService}
+import eu.reactivesystems.workshop.listing.api.ListingEvent
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class BookingServiceImpl(persistentEntityRegistry: PersistentEntityRegistry, listingService: ListingService)(
   implicit ec: ExecutionContext)
   extends BookingService {
+
+
+  listingService.listingEvents().subscribe.atLeastOnce(Flow[ListingEvent].mapAsync(1)(
+    event => entityRef(event.listingId).ask(ListRoom)
+  ))
+
+
 
   override def healthCheck(): ServiceCall[NotUsed, String] =
     request => Future.successful("OK")
