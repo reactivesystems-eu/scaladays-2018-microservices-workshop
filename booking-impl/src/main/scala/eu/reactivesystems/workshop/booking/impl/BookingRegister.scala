@@ -95,6 +95,10 @@ sealed trait BookingRegisterCommand
 
 case class RequestBooking(request: BookingRequest) extends BookingRegisterCommand with ReplyType[UUID]
 
+object RequestBooking {
+  implicit val format: Format[RequestBooking] = Json.format
+}
+
 case class CancelBooking(bookingId: UUID) extends BookingRegisterCommand with ReplyType[Done]
 
 case class RejectBooking(bookingId: UUID) extends BookingRegisterCommand with ReplyType[Done]
@@ -118,6 +122,10 @@ case class BookingRequested(bookingId: UUID,
                             startingDate: LocalDate,
                             duration: Int,
                             numberOfGuests: Int) extends BookingRegisterEvent
+
+object BookingRequested {
+  implicit val format: Format[BookingRequested] = Json.format
+}
 
 case object RoomListed extends BookingRegisterEvent
 

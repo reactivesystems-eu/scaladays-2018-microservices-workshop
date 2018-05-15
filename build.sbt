@@ -103,7 +103,7 @@ lazy val userImpl = (project in file("user-impl"))
 def commonSettings: Seq[Setting[_]] = Seq(
 )
 
-lagomCassandraCleanOnStart in ThisBuild := false
+lagomCassandraCleanOnStart in ThisBuild := true
 
 // ------------------------------------------------------------------------------------------------
 
