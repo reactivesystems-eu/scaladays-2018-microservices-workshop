@@ -19,6 +19,8 @@ abstract class BookingApplication(context: LagomApplicationContext) extends Lago
   override lazy val jsonSerializerRegistry = BookingSerializerRegistry
 
   // Initialize everything
+  persistentEntityRegistry.register(wire[BookingRegister])
+
 }
 
 class BookingApplicationLoader extends LagomApplicationLoader {
