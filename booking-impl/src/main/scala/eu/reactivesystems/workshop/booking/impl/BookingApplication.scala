@@ -14,7 +14,7 @@ abstract class BookingApplication(context: LagomApplicationContext) extends Lago
   with CassandraPersistenceComponents
   with LagomKafkaComponents {
 
-  lazy val itemService = serviceClient.implement[ListingService]
+  lazy val listingService = serviceClient.implement[ListingService]
   override lazy val lagomServer = serverFor[BookingService](wire[BookingServiceImpl])
   override lazy val jsonSerializerRegistry = BookingSerializerRegistry
 

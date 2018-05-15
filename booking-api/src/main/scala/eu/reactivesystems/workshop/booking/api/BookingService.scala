@@ -21,8 +21,6 @@ trait BookingService extends Service {
 
   def rejectBooking(roomId: UUID, bookingId: UUID): ServiceCall[NotUsed, Done]
 
-  def withdrawBooking(roomId: UUID, bookingId: UUID): ServiceCall[NotUsed, Done]
-
   def listRoom(roomId: UUID): ServiceCall[NotUsed, Done]
 
   def unlistRoom(roomId: UUID): ServiceCall[NotUsed, Done]
@@ -41,7 +39,6 @@ trait BookingService extends Service {
         // reject booking
         restCall(Method.POST, "/api/room/:roomId/bookings/:bookingId/reject", rejectBooking _),
         // withdraw booking
-        restCall(Method.POST, "/api/bookings/:roomId/bookings/:bookingId/withdraw", withdrawBooking _),
         restCall(Method.POST, "/api/room/:roomId", listRoom _),
         restCall(Method.DELETE, "/api/room/:roomId", unlistRoom _))
       // TODO later modify booking

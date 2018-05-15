@@ -5,11 +5,11 @@ import java.util.UUID
 import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
-import eu.reactivesystems.workshop.booking.api.{BookingRequest, BookingService}
+import eu.reactivesystems.workshop.booking.api.{BookingRequest, BookingService, ListingService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BookingServiceImpl(persistentEntityRegistry: PersistentEntityRegistry)(
+class BookingServiceImpl(persistentEntityRegistry: PersistentEntityRegistry, listingService: ListingService)(
   implicit ec: ExecutionContext)
   extends BookingService {
 
@@ -29,10 +29,6 @@ class BookingServiceImpl(persistentEntityRegistry: PersistentEntityRegistry)(
 
 
   override def rejectBooking(roomId: UUID, bookingId: UUID): ServiceCall[NotUsed, Done] =
-    request => Future.successful(Done)
-
-
-  override def withdrawBooking(roomId: UUID, bookingId: UUID): ServiceCall[NotUsed, Done] =
     request => Future.successful(Done)
 
 
